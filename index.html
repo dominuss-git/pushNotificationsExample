@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Push Notifications</title>
+  </head>
+  <body>
+    <h1>Push Notifications</h1>
+    <script type="text/javascript">
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("/index.js", { scope: "/" }).then(
+            function (registration) {
+              console.log(
+                "ServiceWorker registration successful with scope: ",
+                registration.scope
+              );
+            },
+            function (err) {
+              console.log("ServiceWorker registration failed: ", err);
+            }
+          ); 
+        });
+
+        navigator.serviceWorker.ready.then(async function (registration) {
+          const pushServerPublicKey =
+            "BNOwhx50npVIpoyZjCLH9cIbp4xx7hw1JORPZJOqycH-RvpJmxnhLvQMqR5hNA2PGvYeRBhjqacR56SS0zasmRc";
+          const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: pushServerPublicKey,
+          });
+
+          fetch("http://localhost:3000/subscription", {
+            method: "POST",
+            body: JSON.stringify(subscription),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
